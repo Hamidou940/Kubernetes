@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug
+spec:
+  containers:
+  - name: debug
+    image: alpine
+    command: ["sleep","3600"]
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - web
+        topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: host13
+  labels:
+    disktype: ssd
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  containers:
+  - name: www
+    image: nginx:1.17-alpine
+  nodeSelector:
+    disktype: ssd
